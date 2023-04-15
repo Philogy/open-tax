@@ -27,6 +27,16 @@ Atom = namedtuple(
 )
 
 
+class AssetType(Enum):
+    Fungible = 'FUNGIBLE'
+    NonFungible = 'NonFungible'
+
+
+AssetId = namedtuple('AssetId', ['main', 'sub', 'atype'])
+AssetSymbol = namedtuple('AssetSymbol', ['symbol'])
+AssetContract = namedtuple('AssetContract', ['chain', 'address'])
+
+
 class BaseAtomizer(ABC):
 
     @abstractmethod

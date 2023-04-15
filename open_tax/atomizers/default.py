@@ -1,6 +1,7 @@
-from .base import BaseAtomizer, Atom, AssetDirection, PurposeHint
+from decimal import Decimal
 from ..utils import alchemy_post, hex_to_int
-from decimal import Decimal as D
+from .base import (BaseAtomizer, Atom, AssetDirection, PurposeHint, AssetId, AssetSymbol,
+                   AssetContract, AssetType)
 
 
 class AlchemyAtomizer(BaseAtomizer):
@@ -15,8 +16,12 @@ class AlchemyAtomizer(BaseAtomizer):
                 wei_fee = hex_to_int(entry['effectiveGasPrice'])\
                     * hex_to_int(entry['gasUsed'])
                 yield Atom(
-                    f'{chain}/{entry["asset"]}',
-                    D(wei_fee) / D(10**18),
+                    AssetId(
+                        AssetSymbol(entry['asset']),
+                        None,
+                        AssetType.Fungible
+                    ),
+                    Decimal(wei_fee) / Decimal(10**18),
                     AssetDirection.Out,
                     entry['timestamp'],
                     PurposeHint.TxFee,
@@ -49,15 +54,15 @@ class AlchemyAtomizer(BaseAtomizer):
                 }
             )
 
-    def _get_atom_value(self, chain, entry):
+    def _get_atom_value(self, chain, entry) -> tuple[AssetId, Decimal]:
         if entry['category'] == 'erc721':
             asset_contract = entry['rawContract']['address']
-            return f'{chain}/erc721({asset_contract})/{entry["tokenId"]}', D(1)
+            return AssetId(AssetContract(chain, asset_contract), entry['tokenId'], AssetType.NonFungible), Decimal(1)
         elif entry['category'] in ('external', 'internal'):
-            return f'{chain}/{entry["asset"]}', entry['value']
+            return AssetId(AssetSymbol(entry['asset']), None, AssetType.Fungible), entry['value']
         elif entry['category'] == 'erc20':
             asset_contract = entry['rawContract']['address']
-            return f'{chain}/{asset_contract}', entry['value']
+            return AssetId(AssetContract(chain, asset_contract), None, AssetType.Fungible), entry['value']
         else:
             raise TypeError(
                 f'Alchemy transfer category "{entry["category"]}" not implemented yet'
