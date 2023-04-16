@@ -1,5 +1,5 @@
 from typing import Union
-from ..atomizers.base import AssetId, AssetSymbol, AssetContract, AssetType
+from ..atomizers.base import AssetId, AssetSymbol
 
 
 SYMBOL_TO_COINGECKO = {
@@ -8,9 +8,7 @@ SYMBOL_TO_COINGECKO = {
 
 
 def assetid_to_coingecko(asset_id: AssetId) -> Union[str, None]:
-    print(f'asset_id: {asset_id}')
     if isinstance(asset_id.main, AssetSymbol)\
-            and asset_id.sub is None\
-            and asset_id.atype == AssetType.Fungible:
+            and asset_id.sub is None:
         return SYMBOL_TO_COINGECKO.get(asset_id.main.symbol)
     return None

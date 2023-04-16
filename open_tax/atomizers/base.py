@@ -27,12 +27,7 @@ Atom = namedtuple(
 )
 
 
-class AssetType(Enum):
-    Fungible = 'FUNGIBLE'
-    NonFungible = 'NonFungible'
-
-
-AssetId = namedtuple('AssetId', ['main', 'sub', 'atype'])
+AssetId = namedtuple('AssetId', ['main', 'sub'])
 AssetSymbol = namedtuple('AssetSymbol', ['symbol'])
 AssetContract = namedtuple('AssetContract', ['chain', 'address'])
 
